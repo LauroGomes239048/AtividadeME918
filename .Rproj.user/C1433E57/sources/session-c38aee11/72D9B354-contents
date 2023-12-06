@@ -1,0 +1,35 @@
+library(stringr)
+
+exit = map2(planos, result, \(x, y) append(x, y))
+dir.create("resultados")
+
+
+fun1 = function(x, r) {
+  distribution = x[[1]]
+  if(distribution == "bernoulli") {
+    p = x[[2]]
+    obs = x[[3]]
+    result = unname(unlist(x[4:(4+obs-1)]))
+    save(distribution, p, obs, result, file = r)
+  }
+  else
+    if(distribution == "poisson") {
+      lambda = x[[2]]
+      obs = x[[3]]
+      result = unname(unlist(x[4:(4+obs-1)]))
+      save(distribution, lambda, obs, result, file = r)
+    }
+    else
+      if(distribution == "normal") {
+        mu = x[[2]]
+        sigma2 = x[[3]]
+        obs = x[[4]]
+        result = unname(unlist(x[5:(5+obs-1)]))
+        save(distribution, mu, sigma2, obs, result, file = r)
+      }
+}
+
+paths = as.list(paste0("resultados/simulacao",str_pad(1:100, 3, pad = "0"),".RData"))
+
+walk2(exit, paths, 
+     .f = \(x, r) fun1(x, r))
